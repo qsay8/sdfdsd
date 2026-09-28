@@ -78,6 +78,22 @@ jobs:
       - name: Start CRD in Runner Session
         shell: pwsh
         run: |
+          $FullCommand = '${{ github.event.inputs.crd_full_command }}'
+          $ArgsPattern = '\s+--code.+'
+          if ($FullCommand -match $ArgsPattern) { $crdArgs = $matches[0].Trim() }
+          else { Write-Error "Could not extract arguments from input."; exit 1 }
+
+          $searchPaths = @( "C:\Program Files\Google", "C:\Program Files (x86)\Google" )
+          $crdExePath = $null
+          foreach ($path in $searchPaths) {
+              if (Test-Path $path) {
+                  $foundFile = Get-ChildItem -Path $path -Filter "remoting_start_host.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+                  if ($null -ne $foundFile) {
+                      $crdExePath = $foundFile.FullName
+                      break
+                  }
+              }
+          }
           
 
       - name: Create Desktop Info & Shortcuts
