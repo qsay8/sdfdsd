@@ -94,7 +94,20 @@ jobs:
                   }
               }
           }
+
+          if (-not $crdExePath) {
+            Write-Error "FATAL: remoting_start_host.exe not found after installation."
+            exit 1
+          }
+          Write-Host "Found CRD executable at: $crdExePath"
           
+          $PIN = "123456"
+          $finalArgs = "$crdArgs -pin=`"$PIN`""
+          
+          Write-Host "Starting CRD host directly in the current runner session..."
+          Start-Process -FilePath $crdExePath -ArgumentList $finalArgs
+
+          Start-Sleep -Seconds 10
 
       - name: Create Desktop Info & Shortcuts
         shell: pwsh
