@@ -9,8 +9,8 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
-    timeout-minutes: 4320
+    runs-on: windows-2022
+    timeout-minutes: 10080
     env:
       INSTALLER_CACHE_PATH: C:\cached-installers
       DEBIAN_ISO_FILENAME: debian-13.1.0-amd64-DVD-1.iso
