@@ -53,11 +53,11 @@ jobs:
           # === PENAMBAHAN BARU: Unduh Debian ISO ===
           Write-Host "Downloading Debian ISO (or using cache)..."
           $isoUrl = "https://cdimage.debian.org/debian-cd/current/amd64/iso-dvd/debian-13.7.0-amd64-DVD-1.iso"
-          $cachedIsoPath = Join-Path "C:\Workspace\ISO\" "debian.iso"
+          $cachedIsoPath = Join-Path "C:\" "debian.iso"
           $finalIsoPath = "C:\Workspace\ISO\debian.iso"
           if (Test-Path $cachedIsoPath) {
               Write-Host "ISO found in cache. Copying to destination..."
-              Copy-Item -Path $cachedIsoPath -Destination $finalIsoPath -Force
+              Copy-Item -Path C:\debian.iso -Destination "C:\Users\runneradmin\debian.iso -Force
           } else {
               Write-Host "ISO not found in cache. Starting download..."
               Invoke-WebRequest -Uri $isoUrl -OutFile $cachedIsoPath -UseBasicParsing
