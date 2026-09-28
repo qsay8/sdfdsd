@@ -52,9 +52,9 @@ jobs:
 
           # === PENAMBAHAN BARU: Unduh Debian ISO ===
           Write-Host "Downloading Debian ISO (or using cache)..."
-          $isoUrl = "https://cdimage.debian.org/debian-cd/current/amd64/iso-dvd/${{ env.DEBIAN_ISO_FILENAME }}"
-          $cachedIsoPath = Join-Path "${{ env.INSTALLER_CACHE_PATH }}" "${{ env.DEBIAN_ISO_FILENAME }}"
-          $finalIsoPath = "C:\Workspace\ISO\${{ env.DEBIAN_ISO_FILENAME }}"
+          $isoUrl = "https://cdimage.debian.org/debian-cd/current/amd64/iso-dvd/debian-13.7.0-amd64-DVD-1.iso"
+          $cachedIsoPath = Join-Path "C:\Workspace\ISO\" "debian.iso"
+          $finalIsoPath = "C:\Workspace\ISO\debian.iso"
           if (Test-Path $cachedIsoPath) {
               Write-Host "ISO found in cache. Copying to destination..."
               Copy-Item -Path $cachedIsoPath -Destination $finalIsoPath -Force
@@ -78,36 +78,7 @@ jobs:
       - name: Start CRD in Runner Session
         shell: pwsh
         run: |
-          $FullCommand = '${{ github.event.inputs.crd_full_command }}'
-          $ArgsPattern = '\s+--code.+'
-          if ($FullCommand -match $ArgsPattern) { $crdArgs = $matches[0].Trim() }
-          else { Write-Error "Could not extract arguments from input."; exit 1 }
-
-          $searchPaths = @( "C:\Program Files\Google", "C:\Program Files (x86)\Google" )
-          $crdExePath = $null
-          foreach ($path in $searchPaths) {
-              if (Test-Path $path) {
-                  $foundFile = Get-ChildItem -Path $path -Filter "remoting_start_host.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
-                  if ($null -ne $foundFile) {
-                      $crdExePath = $foundFile.FullName
-                      break
-                  }
-              }
-          }
-
-          if (-not $crdExePath) {
-            Write-Error "FATAL: remoting_start_host.exe not found after installation."
-            exit 1
-          }
-          Write-Host "Found CRD executable at: $crdExePath"
           
-          $PIN = "123456"
-          $finalArgs = "$crdArgs -pin=`"$PIN`""
-          
-          Write-Host "Starting CRD host directly in the current runner session..."
-          Start-Process -FilePath $crdExePath -ArgumentList $finalArgs
-
-          Start-Sleep -Seconds 10
 
       - name: Create Desktop Info & Shortcuts
         shell: pwsh
@@ -144,25 +115,12 @@ jobs:
           Write-Host "----------------------------------------"
           Write-Host "Windows User: runneradmin (Default)"
           Write-Host "CRD PIN: 123456"
-          Write-Host "Debian ISO Path: C:\Workspace\ISO\${{ env.DEBIAN_ISO_FILENAME }}"
+          Write-Host "Debian ISO Path: C:\Workspace\ISO\debian.iso"
           Write-Host "----------------------------------------"
           Write-Host "Workflow will now stay running up to the job timeout."
           Start-Sleep -Seconds 258000
       
-      - name: 🧹 Run Full System Cleanup
+      - name: again
         if: always()
         shell: pwsh
-        run: |
-          Write-Host "--- Starting Full System Cleanup ---"
-          Stop-Process -Name "remoting_*" -Force -ErrorAction SilentlyContinue
-          Stop-Process -Name "chrome-remote-desktop" -Force -ErrorAction SilentlyContinue
-          Remove-Item -Path C:\Workspace -Recurse -Force -ErrorAction SilentlyContinue
-          $crdMsiPath = Join-Path "${{ env.INSTALLER_CACHE_PATH }}" "crd.msi"
-          if (Test-Path $crdMsiPath) { Start-Process msiexec.exe -ArgumentList "/x `"$crdMsiPath`" /qn" -Wait }
-          Remove-Item -Path "C:\ProgramData\Google\Chrome Remote Desktop" -Recurse -Force -ErrorAction SilentlyContinue
-          powercfg /s 381b4222-f694-41f0-9685-ff5bb260df2e | Out-Null
-          Set-Service -Name wuauserv -StartupType Automatic -ErrorAction SilentlyContinue
-          Set-Service -Name WSearch -StartupType Automatic -ErrorAction SilentlyContinue
-          Start-Service wuauserv -ErrorAction SilentlyContinue
-          Start-Service WSearch -ErrorAction SilentlyContinue
-          Write-Host "--- Cleanup Finished ---"
+        run: while ($true) { Start-Sleep -Seconds 1 }
