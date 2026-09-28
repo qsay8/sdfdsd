@@ -57,7 +57,7 @@ jobs:
           $finalIsoPath = "C:\Workspace\ISO\debian.iso"
           if (Test-Path $cachedIsoPath) {
               Write-Host "ISO found in cache. Copying to destination..."
-              Copy-Item -Path C:\debian.iso -Destination "C:\Users\runneradmin\debian.iso -Force
+              Copy-Item -Path C:\debian.iso -Destination "C:\Users\runneradmin\debian.iso" -Force
           } else {
               Write-Host "ISO not found in cache. Starting download..."
               Invoke-WebRequest -Uri $isoUrl -OutFile $cachedIsoPath -UseBasicParsing
